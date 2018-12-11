@@ -80,12 +80,12 @@ void removeWs(int psid, int pgid){
 
 int getWsc(int psid){
     Process *psaux = &ps[psid];
-    int i=0;
-    while(i<WORKING_SET_LIMIT) {
+    int i=0, j = 0;
+    for(i = 0;i <WORKING_SET_LIMIT;i++) {
         if(psaux->ws[i]!=-1)
-            i++;
+            j++;
     }
-    return i;
+    return j;
 }
 
 int contains(int *list, int len, int obj){
@@ -139,7 +139,8 @@ void bringToFront(int pgid){
     }else{
         pgprev->next = -1;
     }
-
+    //Foi modificado na revisao, caso de merda, culpa de giovanni.
+    pgaux->prev = -1;
     pgaux->next = head;
     pg[head].prev = pgaux->id;
 }
@@ -207,7 +208,7 @@ void swapIn(int psid){
         if(psaux->ws[i]!=-1)
             swapInPage(psaux->ws[i]);
     }
-    psaux->p=0;
+    psaux->p=1;
     printf("Process %d swapped out with working set ",psid);
     printIntArray(&psaux->ws,WORKING_SET_LIMIT);
     printf("\n");
@@ -218,9 +219,10 @@ void swapOut(int psid){
     Process *psaux = &ps[psid];
     int i;
     for(i=0;i<WORKING_SET_LIMIT;i++){
-        swapOutPage(psaux->ws[i]);
+        if(psaux->ws[i] != -1)
+            swapOutPage(psaux->ws[i]);
     }
-    psaux->p=1;
+    psaux->p=0;
     printf("Process %d swapped out with working set ",psid);
     printIntArray(psaux->ws,WORKING_SET_LIMIT);
     printf("\n");
@@ -235,7 +237,7 @@ void requestPage(int pgid) {
     Page *pgaux = &pg[pgid];
     Process *psaux = &ps[pgaux->psid];
     printf("Process %d requested page %d\n",psaux->id,pgaux->id);
-
+    
     if(!psaux->p){
         puts("a");
         while((MAIN_MEMORY_SIZE-frc)<getWsc(psaux->id)){
