@@ -149,8 +149,10 @@ void printIntArray(int *arr, int len){
     puts("printIntArray");
     int i=0;
     for(i=0;i<len;i++){
-        printf("%d ",arr[i]);
+        if(arr[i] != -1)
+            printf("%d ",arr[i]);
     }
+    puts("");
 }
 
 int getEmptyFrame(){
@@ -209,7 +211,7 @@ void swapIn(int psid){
             swapInPage(psaux->ws[i]);
     }
     psaux->p=1;
-    printf("Process %d swapped out with working set ",psid);
+    printf("Process %d swapped in with working set ",psid);
     printIntArray(&psaux->ws,WORKING_SET_LIMIT);
     printf("\n");
 }
@@ -283,7 +285,6 @@ void createProcess() {
     Process *psaux = &ps[psc];
     psaux->id = psc;
     psaux->pgc = ((rand() % MAX_PAGES_PER_PROCESS) + 1);
-
     int i;
     for (i = 0; i < psaux->pgc; i++) {
         Page *pgaux = &pg[pgc];
